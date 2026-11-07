@@ -1,0 +1,232 @@
+<title>Spectrum Foundry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a studio console. Preview monitor + style rack on the left, a narrow channel strip of controls on the right. */
+:root {
+  --bg: #f1f0f4; --panel: #ffffff; --sunk: #e7e5ee; --line: #d9d6e2;
+  --fg: #17161d; --muted: #5f5c6e; --accent: #b25f00; --accent-ink: #ffffff; --danger: #b3261e;
+  --monitor: #07060b;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --f-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111018; --panel: #1a1923; --sunk: #13121a; --line: #2c2a38;
+  --fg: #ecebf3; --muted: #9b98ad; --accent: #ffb43d; --accent-ink: #1a1206; --danger: #ff7a6e; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111018; --panel: #1a1923; --sunk: #13121a; --line: #2c2a38;
+  --fg: #ecebf3; --muted: #9b98ad; --accent: #ffb43d; --accent-ink: #1a1206; --danger: #ff7a6e; color-scheme: dark }
+
+[hidden] { display: none !important; }
+html, body { height: auto; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
+.wrap { max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(26px, 3.2vw, 38px); letter-spacing: -0.02em; margin: 0; line-height: 1; }
+h1 span { color: var(--accent); }
+header p { margin: 0; color: var(--muted); max-width: 62ch; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start; }
+@media (max-width: 960px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.monitor { background: var(--monitor); border-radius: var(--r); overflow: hidden; display: grid; place-items: center; position: relative; }
+.monitor canvas { display: block; max-width: 100%; max-height: 70vh; width: auto; height: auto; }
+.monitor .badge { position: absolute; top: 10px; left: 10px; font: 500 11px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase;
+  color: #fff; background: rgba(0,0,0,.45); padding: 6px 8px; border-radius: 6px; }
+.monitor .badge.rec { background: #c62828; }
+
+.transport { display: grid; grid-template-columns: auto auto minmax(0,1fr) auto; gap: 12px; align-items: center; }
+.btn-play { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; display: grid; place-items: center; }
+.btn-play svg { width: 18px; height: 18px; fill: currentColor; }
+.tc { font: 500 13px/1 var(--f-mono); font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+.tc b { color: var(--fg); font-weight: 500; }
+.timeline { position: relative; height: 44px; background: var(--sunk); border-radius: 8px; overflow: hidden; cursor: pointer; touch-action: none; }
+.timeline canvas { width: 100%; height: 100%; display: block; }
+
+.section-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+h2 { font-family: var(--f-display); font-weight: 700; font-size: 17px; margin: 0; letter-spacing: -0.01em; }
+.hint { color: var(--muted); font-size: 12.5px; }
+
+.styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+@media (min-width: 1240px) { .styles { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+.style-btn { appearance: none; border: 1px solid var(--line); background: var(--panel); border-radius: 9px; padding: 0; cursor: pointer; text-align: left; color: var(--fg); overflow: hidden; display: flex; flex-direction: column; }
+.style-btn canvas { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; }
+.style-btn span { padding: 7px 9px 8px; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; gap: 6px; }
+.style-btn small { font: 400 11px var(--f-mono); color: var(--muted); }
+.style-btn[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.style-btn:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.panel h2 { font-size: 15px; }
+.label { font: 500 11px/1.2 var(--f-mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+select, input[type="text"], input[type="number"] { width: 100%; font: inherit; color: var(--fg); background: var(--sunk); border: 1px solid var(--line); border-radius: 7px; padding: 7px 9px; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+input[type="color"] { width: 100%; height: 32px; border: 1px solid var(--line); border-radius: 7px; background: var(--sunk); padding: 2px; }
+.slider-head { display: flex; justify-content: space-between; }
+.slider-head output { font: 500 11px var(--f-mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+
+.drop { border: 1.5px dashed var(--line); border-radius: 9px; padding: 14px; display: flex; gap: 12px; align-items: center; cursor: pointer; background: var(--sunk); }
+.drop.over { border-color: var(--accent); }
+.drop svg { width: 28px; height: 28px; flex: none; stroke: var(--accent); fill: none; stroke-width: 1.6; }
+.drop div { min-width: 0; }
+.drop strong { display: block; font-weight: 600; }
+.drop .meta { font: 400 12px var(--f-mono); color: var(--muted); overflow-wrap: anywhere; }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; }
+.sw { appearance: none; border: 1px solid var(--line); border-radius: 7px; padding: 0; cursor: pointer; overflow: hidden; background: var(--sunk); color: var(--fg); }
+.sw i { display: block; height: 22px; }
+.sw b { display: block; font: 500 11px var(--f-body); padding: 4px 6px; text-align: left; }
+.sw[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+
+.seg { display: flex; background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 3px; }
+.seg button { flex: 1; border: 0; background: transparent; color: var(--muted); font: 500 12.5px var(--f-body); padding: 6px 4px; border-radius: 6px; cursor: pointer; }
+.seg button:disabled { opacity: .45; cursor: not-allowed; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+
+.btn { appearance: none; border: 1px solid var(--line); background: var(--sunk); color: var(--fg); font: 600 13px var(--f-body); padding: 9px 12px; border-radius: 8px; cursor: pointer; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-size: 14.5px; padding: 12px 14px; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-row .btn { flex: 1; }
+.progress { height: 8px; background: var(--sunk); border-radius: 4px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .15s linear; }
+.status { font: 400 12px/1.5 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.status.err { color: var(--danger); }
+.result video { width: 100%; border-radius: 8px; background: #000; display: block; }
+.small-note { font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Spectrum<span>/</span>Foundry</h1>
+    <p>Drop in any audio file, pick one of 14 visualizer styles, and render a full-length MP4 with the original sound. Everything runs in your browser; nothing is uploaded.</p>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <div class="monitor" id="monitor">
+        <canvas id="preview" width="1280" height="720" aria-label="Visualizer preview"></canvas>
+        <div class="badge" id="badge">Preview</div>
+      </div>
+      <div class="transport">
+        <button class="btn-play" id="play" aria-label="Play"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+        <div class="tc"><b id="tcNow">0:00.0</b> / <span id="tcDur">0:00</span></div>
+        <div class="timeline" id="timeline" role="slider" aria-label="Seek" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><canvas id="tlCanvas"></canvas></div>
+        <div class="tc" id="tcClip">clip full</div>
+      </div>
+
+      <div class="section-h"><h2>Styles</h2><span class="hint">Thumbnails show your audio at the playhead</span></div>
+      <div class="styles" id="styles"></div>
+    </div>
+
+    <div class="col">
+      <section class="panel">
+        <h2>Audio</h2>
+        <label class="drop" id="drop" for="file">
+          <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <div><strong id="fileName">Loading demo track…</strong><span class="meta" id="fileMeta">Drop an audio file here or click to choose. MP3, WAV, FLAC, OGG, M4A, AAC and video files with sound work.</span></div>
+        </label>
+        <input type="file" id="file" accept="audio/*,video/*,.mp3,.wav,.flac,.ogg,.m4a,.aac,.opus,.webm" hidden>
+      </section>
+
+      <section class="panel">
+        <h2>Look</h2>
+        <div class="field"><span class="label">Palette</span><div class="swatches" id="swatches"></div></div>
+        <div class="row3" id="customColors" hidden>
+          <div class="field"><span class="label">Low</span><input type="color" id="c1" value="#ff4d6d"></div>
+          <div class="field"><span class="label">High</span><input type="color" id="c2" value="#4dd2ff"></div>
+          <div class="field"><span class="label">Backdrop</span><input type="color" id="cbg" value="#0a0912"></div>
+        </div>
+        <div class="field"><span class="label">Background</span>
+          <div class="seg" id="bgMode"><button data-v="solid" aria-pressed="false">Solid</button><button data-v="glow" aria-pressed="true">Glow</button><button data-v="image" aria-pressed="false">Image</button></div>
+        </div>
+        <div class="field" id="bgImageField" hidden>
+          <button class="btn" id="bgPick">Choose background image…</button>
+          <input type="file" id="bgFile" accept="image/*" hidden>
+          <div class="slider-head"><span class="label">Image dim</span><output id="dimOut">55%</output></div>
+          <input type="range" id="dim" min="0" max="0.9" step="0.05" value="0.55">
+        </div>
+        <div class="row">
+          <div class="field"><div class="slider-head"><span class="label">Bands</span><output id="bandsOut">64</output></div><input type="range" id="bands" min="16" max="192" step="8" value="64"></div>
+          <div class="field"><div class="slider-head"><span class="label">Sensitivity</span><output id="gainOut">1.00×</output></div><input type="range" id="gain" min="0.4" max="2.5" step="0.05" value="1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><div class="slider-head"><span class="label">Smoothing</span><output id="smoothOut">0.80</output></div><input type="range" id="smooth" min="0" max="0.95" step="0.01" value="0.8"></div>
+          <div class="field"><div class="slider-head"><span class="label">Glow</span><output id="glowOut">0.50</output></div><input type="range" id="glow" min="0" max="1" step="0.05" value="0.5"></div>
+        </div>
+        <div class="row">
+          <div class="field"><span class="label">Lowest Hz</span><input type="number" id="fmin" value="35" min="20" max="400" step="5"></div>
+          <div class="field"><span class="label">Highest Hz</span><input type="number" id="fmax" value="16000" min="2000" max="22000" step="500"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Text</h2>
+        <div class="field"><span class="label">Title</span><input type="text" id="title" value="Glass Harbor"></div>
+        <div class="field"><span class="label">Artist / subtitle</span><input type="text" id="artist" value="Demo track · generated in your browser"></div>
+        <div class="field"><span class="label">Position</span>
+          <div class="seg" id="textPos"><button data-v="bl" aria-pressed="true">Bottom left</button><button data-v="tl" aria-pressed="false">Top left</button><button data-v="c" aria-pressed="false">Center</button><button data-v="none" aria-pressed="false">Off</button></div>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="showProgress" checked> Progress bar</label>
+          <label class="check"><input type="checkbox" id="showTime" checked> Timecode</label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Output</h2>
+        <div class="field"><span class="label">Format</span>
+          <select id="res">
+            <option value="1920x1080" selected>1080p landscape · 1920×1080</option>
+            <option value="1280x720">720p landscape · 1280×720</option>
+            <option value="3840x2160">4K landscape · 3840×2160</option>
+            <option value="1080x1080">Square · 1080×1080</option>
+            <option value="1080x1350">Portrait 4:5 · 1080×1350</option>
+            <option value="1080x1920">Vertical 9:16 · 1080×1920</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field"><span class="label">Frame rate</span>
+            <select id="fps"><option value="24">24 fps</option><option value="30" selected>30 fps</option><option value="60">60 fps</option></select></div>
+          <div class="field"><span class="label">Quality</span>
+            <select id="quality"><option value="standard">Standard</option><option value="high" selected>High</option><option value="max">Maximum</option></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><span class="label">Start (s)</span><input type="number" id="clipStart" value="0" min="0" step="0.5"></div>
+          <div class="field"><span class="label">End (s)</span><input type="number" id="clipEnd" value="" min="0" step="0.5" placeholder="end"></div>
+        </div>
+        <div class="field"><span class="label">Processing</span>
+          <div class="seg" id="proc"><button data-v="client" aria-pressed="true">In this browser</button><button data-v="server" aria-pressed="false" disabled>On the server</button></div>
+          <span class="small-note" id="procNote"></span>
+        </div>
+        <button class="btn btn-primary" id="render">Render video</button>
+        <div id="renderBox" hidden>
+          <div class="progress"><i id="bar"></i></div>
+        </div>
+        <div class="status" id="status">Renders faster than real time where your browser supports WebCodecs (Chrome, Edge, Safari 17+, Firefox 130+).</div>
+        <div class="btn-row" id="cancelRow" hidden><button class="btn" id="cancel">Cancel render</button></div>
+        <div class="result" id="result" hidden>
+          <video id="resultVideo" controls playsinline></video>
+          <div class="btn-row" style="margin-top:10px"><button class="btn btn-primary" id="save">Save video</button></div>
+          <div class="small-note" id="saveNote"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/mp4-muxer.js"></script>
+<script src="renderer.js"></script>
+<script src="app.js"></script>

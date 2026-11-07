@@ -1,0 +1,21 @@
+{
+  "name": "spectrum-foundry",
+  "version": "1.0.0",
+  "description": "Turn any audio file into a spectrum visualizer video, rendered in the browser or on the server.",
+  "private": true,
+  "license": "MIT",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fontsource/bricolage-grotesque": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@napi-rs/canvas": "1.1.0",
+    "express": "5.3.0",
+    "multer": "2.5.0"
+  }
+}
